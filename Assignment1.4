@@ -13,7 +13,8 @@ print(str(spotify_data))
 
 features <- c('acousticness', 'danceability', 'energy', 'instrumentalness', 'liveness', 'loudness', 'speechiness', 'valence')
 
-for (feature in features) {
+for (feature in features) 
+{
   p <- ggplot(spotify_data, aes_string(feature)) + 
     geom_histogram(binwidth = 0.05, fill = 'blue', color = 'black', alpha = 0.7) +
     ggtitle(paste('Distribution of', feature)) +
