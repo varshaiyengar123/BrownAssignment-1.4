@@ -24,3 +24,5 @@ for (feature in features)
     ylab('Count')
   print(p)
 }
+
+numeric_features <- spotify_data %>% select(acousticness, danceability, energy, instrumentalness, liveness, loudness, speechiness, valence)
