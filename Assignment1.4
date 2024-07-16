@@ -41,4 +41,9 @@ corrplot(correlation_matrix, method = "color", tl.cex = 0.8, tl.col = "black", n
 def get_recommendations(favorite_songs, n_recommendations = 5):
 recommendations = []
     for song in favorite_songs:
-      similar_songs = data.sample(n = n_recommendations)
+      sim_songs = data.sample(n = n_recommendations)
+      recommendations.extend(sim_songs['track_name'].values)
+      return recommendations
+
+fav_songs = ['Song1', 'Song2', 'Song3']
+recommendations = get_recommendations(fav_songs)
