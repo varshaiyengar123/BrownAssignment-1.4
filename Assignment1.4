@@ -1,3 +1,5 @@
+#(Part 1):
+
 library(tidyverse)
 library(ggplot2)
 library(corrplot)
@@ -30,3 +32,13 @@ numeric_features <- spotify_data %>% select(acousticness, danceability, energy, 
 correlation_matrix <- cor(numeric_features, use = "complete.obs")
 
 corrplot(correlation_matrix, method = "color", tl.cex = 0.8, tl.col = "black", number.cex = 0.7)
+
+
+#(Part 2):
+
+
+#(Part 3):
+def get_recommendations(favorite_songs, n_recommendations = 5):
+recommendations = []
+    for song in favorite_songs:
+      similar_songs = data.sample(n = n_recommendations)
