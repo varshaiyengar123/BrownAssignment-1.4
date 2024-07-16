@@ -26,3 +26,7 @@ for (feature in features)
 }
 
 numeric_features <- spotify_data %>% select(acousticness, danceability, energy, instrumentalness, liveness, loudness, speechiness, valence)
+
+correlation_matrix <- cor(numeric_features, use = "complete.obs")
+
+corrplot(correlation_matrix, method = "color", tl.cex = 0.8, tl.col = "black", number.cex = 0.7)
