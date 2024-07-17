@@ -114,18 +114,21 @@ def collect_feedback(recommendations):
 feedback = {}
 print("Please rate your Spotify recommended songs on a scale of 1 to 5: ")
 
-for song in recommendations:
-  while True:
-    try:
-      rate = input("Rate this song '{song}' on a scale of 1 to 5: ")
-      if 1 <= rating <= 5:
-        feedback[song] = rate
-        break
-        else:
-          print("Please print a number 1 to 5. ")
-    except Error:
-      print("Value is invalid. Please enter a number 1 through 5. ")
-return feedback
+def collect_feedback(recommendations):
+    feedback = {}
+    print("Please rate your Spotify recommended songs on a scale of 1 to 5: ")
+    for song in recommendations:
+        while True:
+            try:
+                rate = int(input(f"Rate this song '{song}' on a scale of 1 to 5: "))
+                if 1 <= rate <= 5:
+                    feedback[song] = rate
+                    break
+                else:
+                    print("Please enter a number from 1 to 5.")
+            except ValueError:
+                print("Invalid input. Please enter a number from 1 to 5.")
+    return feedback
 #Innovation(part 4)
 import pandas as pd
 
