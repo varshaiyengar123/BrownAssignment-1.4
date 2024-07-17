@@ -100,19 +100,20 @@ plt.show()
 #(Part 3):
 
 def get_recommendations(favorite_songs, n_recommendations = 5):
-recommendations = []
+    recommendations = []
+
     for song in favorite_songs:
-      sim_songs = data.sample(n = n_recommendations)
-      recommendations.extend(sim_songs['track_name'].values)
-      return recommendations
+        sim_songs = data.sample(n = n_recommendations)
+        recommendations.extend(sim_songs['track_name'].values)
+        return recommendations
 
 fav_songs = ['Song1', 'Song2', 'Song3']
 recommendations = get_recommendations(fav_songs)
 print("Some songs we would recommend:", recommendations)
 
 def collect_feedback(recommendations):
-feedback = {}
-print("Please rate your Spotify recommended songs on a scale of 1 to 5: ")
+    feedback = {}
+    print("Please rate your Spotify recommended songs on a scale of 1 to 5: ")
 
 def collect_feedback(recommendations):
     feedback = {}
