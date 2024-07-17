@@ -126,3 +126,45 @@ for song in recommendations:
     except Error:
       print("Value is invalid. Please enter a number 1 through 5. ")
 return feedback
+#Innovation(part 4)
+import pandas as pd
+
+
+file_path = '/Users/saumykrishna/Downloads/spotify_tracks.csv'
+spotify_tracks = pd.read_csv(file_path, skiprows=1)
+
+
+spotify_tracks.columns = spotify_tracks.columns.str.strip()
+
+
+print("Column names in the dataframe after stripping spaces:")
+print(spotify_tracks.columns)
+
+
+mood_categories = {
+    'Happy': {'energy': (0.6, 1.0), 'valence': (0.6, 1.0)},
+    'Sad': {'energy': (0.0, 0.4), 'valence': (0.0, 0.4)},
+    'Calm': {'energy': (0.0, 0.4), 'valence': (0.4, 0.6)},
+    'Excited': {'energy': (0.6, 1.0), 'valence': (0.4, 0.6)},
+    'Angry': {'energy': (0.6, 1.0), 'valence': (0.0, 0.4)}
+}
+
+
+def get_song_recommendations(mood, tracks_df, mood_categories):
+    mood_range = mood_categories[mood]
+    filtered_tracks = tracks_df[
+        (tracks_df['energy'] >= mood_range['energy'][0]) & 
+        (tracks_df['energy'] <= mood_range['energy'][1]) &
+        (tracks_df['valence'] >= mood_range['valence'][0]) & 
+        (tracks_df['valence'] <= mood_range['valence'][1])
+    ]
+    recommendations = filtered_tracks[['track_name', 'artists', 'album_name', 'energy', 'valence']]
+    return recommendations
+
+
+selected_mood = 'Angry'
+song_recommendations = get_song_recommendations(selected_mood, spotify_tracks, mood_categories)
+
+
+print(f"\n{selected_mood} Songs Recommendations:")
+print(song_recommendations.head())
