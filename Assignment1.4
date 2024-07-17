@@ -1,37 +1,4 @@
-#(Part 1):
 
-library(tidyverse)
-library(ggplot2)
-library(corrplot)
-
-file_path <- 'C:/Users/YourUsername/Downloads/spotify_tracks-1.csv'
-spotify_data <- read.csv(file_path)
-
-print(head(spotify_data))
-
-print(summary(spotify_data))
-
-print(str(spotify_data))
-
-features <- c('acousticness', 'danceability', 'energy', 'instrumentalness', 'liveness', 'loudness', 'speechiness', 'valence')
-
-for (feature in features) 
-{
-  p <- ggplot(spotify_data, aes_string(feature)) + 
-    geom_histogram(binwidth = 0.05, fill = 'blue', color = 'black', alpha = 0.7) +
-    ggtitle(paste('Distribution of', feature)) +
-    theme_minimal() +
-    theme(plot.title = element_text(hjust = 0.5)) +
-    xlab(feature) + 
-    ylab('Count')
-  print(p)
-}
-
-numeric_features <- spotify_data %>% select(acousticness, danceability, energy, instrumentalness, liveness, loudness, speechiness, valence)
-
-correlation_matrix <- cor(numeric_features, use = "complete.obs")
-
-corrplot(correlation_matrix, method = "color", tl.cex = 0.8, tl.col = "black", number.cex = 0.7)
 
 
 #(Part 2):
@@ -39,81 +6,132 @@ corrplot(correlation_matrix, method = "color", tl.cex = 0.8, tl.col = "black", n
 import pandas as pd
 
 
-data = pd.read_csv("Spotify Tracks.csv")
-
-Q1 = data.quantile(0.25)
-Q3 = data.quantile(0.75)
-IQR = Q3 - Q1
+data = pd.read_csv("/Users/saumykrishna/Downloads/spotify_tracks.csv", low_memory=False)
 
 
-lower_bound = Q1 - 1.5 * IQR
-upper_bound = Q3 + 1.5 * IQR
+print("Data preview:")
+print(data.head())
 
-data_cleaned = data[~((data < lower_bound) | (data > upper_bound)).any(axis=1)]
 
-print("Cleaned Data:")
-print(data_cleaned)
-
+print("Column names:")
+print(data.columns)
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
 from sklearn.cluster import KMeans, DBSCAN, AgglomerativeClustering
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import silhouette_score
 
 
-scaler = StandardScaler()
-data_scaled = scaler.fit_transform(data_cleaned)
+data = pd.read_csv("/Users/saumykrishna/Downloads/spotify_tracks.csv", low_memory=False)
 
 
+print("Data preview:")
+print(data.head())
 
 
-dbscan = DBSCAN(eps=0.5, min_samples=5)
-dbscan_labels = dbscan.fit_predict(data_scaled)
-dbscan_silhouette = silhouette_score(data_scaled, dbscan_labels)
-
-agglo = AgglomerativeClustering(n_clusters=5)
-agglo_labels = agglo.fit_predict(data_scaled)
-agglo_silhouette = silhouette_score(data_scaled, agglo_labels)
+print("Column names:")
+print(data.columns)
 
 
-print(f"DBSCAN Silhouette Score: {dbscan_silhouette}")
-print(f"Agglomerative Clustering Silhouette Score: {agglo_silhouette}")
+data = data.apply(pd.to_numeric, errors='coerce')
 
 
+data = data.dropna(axis=1, how='all')
 
-range_eps = np.arange(0.1, 1.0, 0.1)
-silhouette_avg = []
 
-for eps in range_eps:
-    dbscan = DBSCAN(eps=eps, min_samples=5)
+data_cleaned = data.dropna()
+
+print("Cleaned Data:")
+print(data_cleaned)
+
+
+if data_cleaned.empty:
+    print("The cleaned DataFrame is empty. Check your data and cleaning steps.")
+else:
+    
+    Q1 = data_cleaned.quantile(0.25)
+    Q3 = data_cleaned.quantile(0.75)
+    IQR = Q3 - Q1
+
+    lower_bound = Q1 - 1.5 * IQR
+    upper_bound = Q3 + 1.5 * IQR
+
+    
+    data_filtered = data_cleaned[~((data_cleaned < lower_bound) | (data_cleaned > upper_bound)).any(axis=1)]
+
+    
+    scaler = StandardScaler()
+    data_scaled = scaler.fit_transform(data_filtered)
+
+  
+    dbscan = DBSCAN(eps=0.5, min_samples=5)
     dbscan_labels = dbscan.fit_predict(data_scaled)
-    if len(set(dbscan_labels)) > 1: 
-        silhouette_avg.append(silhouette_score(data_scaled, dbscan_labels))
-    else:
-        silhouette_avg.append(-1)
 
-plt.plot(range_eps, silhouette_avg)
-plt.title('Silhouette Analysis for DBSCAN')
-plt.xlabel('Epsilon')
-plt.ylabel('Silhouette Score')
-plt.show()
+ 
+    dbscan_labels_filtered = dbscan_labels[dbscan_labels != -1]
+    data_scaled_filtered = data_scaled[dbscan_labels != -1]
+
+    if len(set(dbscan_labels_filtered)) > 1:
+        dbscan_silhouette = silhouette_score(data_scaled_filtered, dbscan_labels_filtered)
+    else:
+        dbscan_silhouette = -1
+
+   
+    agglo = AgglomerativeClustering(n_clusters=5)
+    agglo_labels = agglo.fit_predict(data_scaled)
+    agglo_silhouette = silhouette_score(data_scaled, agglo_labels)
+
+    print(f"DBSCAN Silhouette Score: {dbscan_silhouette}")
+    print(f"Agglomerative Clustering Silhouette Score: {agglo_silhouette}")
+
+  
+    range_eps = np.arange(0.1, 1.0, 0.1)
+    silhouette_avg = []
+
+    for eps in range_eps:
+        dbscan = DBSCAN(eps=eps, min_samples=5)
+        dbscan_labels = dbscan.fit_predict(data_scaled)
+        
+        dbscan_labels_filtered = dbscan_labels[dbscan_labels != -1]
+        data_scaled_filtered = data_scaled[dbscan_labels != -1]
+
+        if len(set(dbscan_labels_filtered)) > 1:
+            silhouette_avg.append(silhouette_score(data_scaled_filtered, dbscan_labels_filtered))
+        else:
+            silhouette_avg.append(-1)
+
+    plt.plot(range_eps, silhouette_avg)
+    plt.title('Silhouette Analysis for DBSCAN')
+    plt.xlabel('Epsilon')
+    plt.ylabel('Silhouette Score')
+    plt.show()
+
+
+
+
+
 
 
 #(Part 3):
 
-def get_recommendations(favorite_songs, n_recommendations = 5):
-    recommendations = []
+import pandas as pd
 
+
+data = pd.DataFrame({
+    'track_name': ['SongA', 'SongB', 'SongC', 'SongD', 'SongE', 'SongF', 'SongG', 'SongH', 'SongI', 'SongJ']
+})
+
+def get_recommendations(favorite_songs, n_recommendations=5):
+    recommendations = []
     for song in favorite_songs:
-        sim_songs = data.sample(n = n_recommendations)
+        sim_songs = data.sample(n=n_recommendations)
         recommendations.extend(sim_songs['track_name'].values)
-        return recommendations
+    return recommendations 
 
 fav_songs = ['Song1', 'Song2', 'Song3']
 recommendations = get_recommendations(fav_songs)
 print("Some songs we would recommend:", recommendations)
-
-def collect_feedback(recommendations):
-    feedback = {}
-    print("Please rate your Spotify recommended songs on a scale of 1 to 5: ")
 
 def collect_feedback(recommendations):
     feedback = {}
@@ -130,14 +148,27 @@ def collect_feedback(recommendations):
             except ValueError:
                 print("Invalid input. Please enter a number from 1 to 5.")
     return feedback
-    
-#Innovation(part 4):
 
+
+feedback = collect_feedback(recommendations)
+print("User feedback:", feedback)
+
+
+
+
+#Innovation(part 4)
 import pandas as pd
 
 
 file_path = '/Users/saumykrishna/Downloads/spotify_tracks.csv'
-spotify_tracks = pd.read_csv(file_path, skiprows=1)
+
+
+try:
+    spotify_tracks = pd.read_csv(file_path, skiprows=1)
+    print("CSV file loaded successfully.")
+except FileNotFoundError:
+    print(f"File not found: {file_path}")
+    raise
 
 
 spotify_tracks.columns = spotify_tracks.columns.str.strip()
