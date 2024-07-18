@@ -1,4 +1,34 @@
+library(tidyverse)
+library(ggplot2)
+library(corrplot)
 
+file_path <- 'C:/Users/YourUsername/Downloads/spotify_tracks-1.csv'
+spotify_data <- read.csv(file_path)
+
+print(head(spotify_data))
+
+print(summary(spotify_data))
+
+print(str(spotify_data))
+
+features <- c('acousticness', 'danceability', 'energy', 'instrumentalness', 'liveness', 'loudness', 'speechiness', 'valence')
+
+for (feature in features) {
+  p <- ggplot(spotify_data, aes_string(feature)) + 
+    geom_histogram(binwidth = 0.05, fill = 'blue', color = 'black', alpha = 0.7) +
+    ggtitle(paste('Distribution of', feature)) +
+    theme_minimal() +
+    theme(plot.title = element_text(hjust = 0.5)) +
+    xlab(feature) + 
+    ylab('Count')
+  print(p)
+}
+
+numeric_features <- spotify_data %>% select(acousticness, danceability, energy, instrumentalness, liveness, loudness, speechiness, valence)
+
+correlation_matrix <- cor(numeric_features, use = "complete.obs")
+
+corrplot(correlation_matrix, method = "color", tl.cex = 0.8, tl.col = "black", number.cex = 0.7)
 
 
 #(Part 2):
